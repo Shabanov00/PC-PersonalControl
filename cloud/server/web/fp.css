@@ -1,0 +1,30 @@
+:root{color-scheme:dark;--bg:#0b1020;--panel:rgba(22,31,54,.72);--line:rgba(178,200,255,.12);--text:#f3f6ff;--muted:#a2aec8;--blue:#77a8ff;--mint:#65e0bd;--amber:#ffc36a;--red:#ff8796;font-family:Inter,"Segoe UI",system-ui,-apple-system,sans-serif}
+*{box-sizing:border-box}
+body{min-height:100vh;margin:0;padding:calc(18px + env(safe-area-inset-top,0px)) 16px calc(28px + env(safe-area-inset-bottom,0px));color:var(--text);background:radial-gradient(70% 46% at 8% 0,rgba(87,119,255,.23),transparent 70%),radial-gradient(58% 45% at 100% 18%,rgba(51,220,183,.13),transparent 72%),linear-gradient(160deg,#0b1020,#10172b 55%,#0b1020)}
+.shell{width:min(100%,560px);margin:0 auto}
+.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.brand{font-size:18px;font-weight:750}.cap{color:var(--muted);font-size:11px;margin-top:2px}
+.badge{display:inline-flex;align-items:center;gap:7px;padding:7px 11px;border:1px solid var(--line);border-radius:999px;font-size:11px;color:var(--muted)}
+.badge i{width:7px;height:7px;border-radius:50%;background:var(--red)}.badge.on{color:#d8ffef}.badge.on i{background:var(--mint);box-shadow:0 0 10px var(--mint)}
+h1{margin:6px 0 10px;font-size:clamp(26px,7vw,36px);line-height:1.1;letter-spacing:-1px}
+h2{margin:22px 3px 10px;font-size:15px}
+p{color:#c0cbe1;line-height:1.55;font-size:14px}
+.card{padding:15px;border:1px solid var(--line);border-radius:19px;background:var(--panel);backdrop-filter:blur(16px)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+.tl{color:var(--muted);font-size:11px}.tv{margin-top:4px;font-size:34px;font-weight:760;letter-spacing:-1px}.tv small{font-size:15px;color:var(--muted);font-weight:500}
+.bar{height:6px;margin-top:10px;border-radius:9px;background:rgba(255,255,255,.08);overflow:hidden}.bar b{display:block;height:100%;border-radius:9px;background:var(--blue)}
+.ok{color:var(--mint)}.warn{color:var(--amber)}.hot{color:var(--red)}
+.row{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13px}.row:last-child{border:0}
+.row span:first-child{color:var(--muted)}.row span:last-child{text-align:right;word-break:break-word}
+.btn{display:inline-block;padding:13px 18px;border:1px solid var(--line);border-radius:14px;color:var(--text);background:var(--panel);font:inherit;font-size:14px;font-weight:650;cursor:pointer;text-decoration:none;text-align:center}
+.btn.primary{background:linear-gradient(135deg,#4f7dff,#35c9a8);border:0;color:#06101f}
+.btn:disabled{opacity:.45;cursor:not-allowed}.btn.red{color:var(--red)}
+.actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.chip{padding:8px 13px;border:1px solid var(--line);border-radius:999px;background:none;color:var(--muted);font:inherit;font-size:12px}.chip.sel{color:var(--text);border-color:var(--blue)}
+.note{margin-top:14px;padding:13px 14px;border:1px solid rgba(255,195,106,.18);border-radius:15px;color:#d4c8b2;background:rgba(105,75,31,.13);font-size:12px;line-height:1.5}
+.note.info{border-color:rgba(119,168,255,.25);color:#c9d8fa;background:rgba(62,93,155,.16)}
+.toast{position:fixed;left:16px;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));max-width:420px;margin:auto;padding:12px 15px;border:1px solid var(--line);border-radius:14px;background:rgba(28,39,64,.95);font-size:13px;text-align:center;opacity:0;transform:translateY(10px);transition:.2s;pointer-events:none}.toast.show{opacity:1;transform:none}
+.timer{display:flex;gap:8px;margin-top:10px}.timer input,.timer select{flex:1;min-width:0;padding:11px;border:1px solid var(--line);border-radius:12px;background:rgba(9,16,33,.5);color:var(--text);font:inherit}
+ol{padding-left:20px;color:#c0cbe1;line-height:1.7;font-size:14px}.rel{padding:12px 0;border-bottom:1px solid var(--line)}.rel:last-child{border:0}.rel b{font-size:14px}.rel div{color:var(--muted);font-size:12px;margin-top:3px;white-space:pre-line}
+.foot{padding:18px 6px 0;text-align:center;color:#7986a1;font-size:11px;line-height:1.5}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
