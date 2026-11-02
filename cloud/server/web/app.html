@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b1020">
+  <meta name="description" content="Простая и безопасная панель управления FanPilot для Telegram.">
+  <title>FanPilot — панель управления</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0b1020;
+      --panel: rgba(22, 31, 54, .72);
+      --line: rgba(178, 200, 255, .12);
+      --text: #f3f6ff;
+      --muted: #a2aec8;
+      --blue: #77a8ff;
+      --mint: #65e0bd;
+      --amber: #ffc36a;
+      --red: #ff8796;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      font-family: Inter, "Segoe UI", system-ui, -apple-system, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      padding: calc(20px + var(--safe-top)) 18px calc(28px + var(--safe-bottom));
+      color: var(--text);
+      background:
+        radial-gradient(70% 46% at 8% 0%, rgba(87, 119, 255, .23), transparent 70%),
+        radial-gradient(58% 45% at 100% 18%, rgba(51, 220, 183, .13), transparent 72%),
+        linear-gradient(160deg, #0b1020 0%, #10172b 55%, #0b1020 100%);
+    }
+
+    button { font: inherit; }
+
+    .shell { width: min(100%, 560px); margin: 0 auto; }
+    .topline { display: flex; align-items: center; justify-content: space-between; margin: 2px 2px 22px; }
+    .brand { display: flex; align-items: center; gap: 11px; }
+    .brand-mark {
+      display: grid; width: 43px; height: 43px; place-items: center;
+      border: 1px solid rgba(255,255,255,.22); border-radius: 15px;
+      background: linear-gradient(145deg, rgba(126,165,255,.36), rgba(64,224,193,.17));
+      box-shadow: 0 10px 30px rgba(61, 113, 255, .2), inset 0 1px rgba(255,255,255,.22);
+    }
+    .brand-mark svg { width: 25px; height: 25px; }
+    .brand-name { font-size: 17px; font-weight: 750; letter-spacing: .2px; }
+    .brand-caption { margin-top: 2px; color: var(--muted); font-size: 11px; }
+    .connection {
+      display: inline-flex; align-items: center; gap: 7px; padding: 8px 10px;
+      border: 1px solid var(--line); border-radius: 999px; color: #d8ffef;
+      background: rgba(38, 138, 113, .16); font-size: 11px; white-space: nowrap;
+    }
+    .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--mint); box-shadow: 0 0 12px var(--mint); }
+
+    .hero {
+      position: relative; overflow: hidden; padding: 25px 23px 23px;
+      border: 1px solid rgba(190, 207, 255, .2); border-radius: 27px;
+      background: linear-gradient(135deg, rgba(73, 100, 175, .35), rgba(28, 43, 73, .58) 58%, rgba(33, 119, 112, .22));
+      box-shadow: 0 24px 65px rgba(0, 0, 0, .28), inset 0 1px rgba(255,255,255,.12);
+      backdrop-filter: blur(22px);
+    }
+    .hero::after {
+      position: absolute; top: -82px; right: -65px; width: 220px; height: 220px;
+      border: 1px solid rgba(218,235,255,.12); border-radius: 50%;
+      box-shadow: 0 0 0 23px rgba(218,235,255,.025), 0 0 0 47px rgba(218,235,255,.02);
+      content: "";
+    }
+    .eyebrow { color: #c4d4ff; font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; }
+    h1 { position: relative; z-index: 1; margin: 9px 0 8px; font-size: clamp(26px, 7vw, 36px); line-height: 1.08; letter-spacing: -1.1px; }
+    .hero-copy { position: relative; z-index: 1; max-width: 360px; margin: 0; color: #c0cbe1; font-size: 14px; line-height: 1.55; }
+    .status-card {
+      position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between;
+      gap: 12px; margin-top: 22px; padding: 14px 15px;
+      border: 1px solid rgba(220,230,255,.13); border-radius: 17px;
+      background: rgba(9, 16, 33, .34);
+    }
+    .status-label { color: var(--muted); font-size: 11px; }
+    .status-value { margin-top: 4px; font-size: 14px; font-weight: 650; }
+    .status-icon { display: grid; flex: 0 0 auto; width: 39px; height: 39px; place-items: center; border-radius: 13px; background: rgba(103, 224, 190, .12); color: var(--mint); }
+    .status-icon svg { width: 21px; height: 21px; }
+
+    .section-head { display: flex; align-items: end; justify-content: space-between; margin: 25px 3px 12px; }
+    h2 { margin: 0; font-size: 16px; letter-spacing: -.2px; }
+    .section-hint { color: var(--muted); font-size: 11px; }
+    .action-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 11px; }
+    .action {
+      min-height: 104px; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between;
+      padding: 15px; border: 1px solid var(--line); border-radius: 19px; color: var(--text);
+      text-align: left; cursor: pointer; background: var(--panel);
+      box-shadow: inset 0 1px rgba(255,255,255,.045); backdrop-filter: blur(16px);
+      transition: transform .16s ease, border-color .16s ease, background .16s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .action:active { transform: scale(.98); }
+    .action:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
+    .action:hover { border-color: rgba(150, 184, 255, .38); background: rgba(39, 51, 80, .86); }
+    .action[disabled] { opacity: .46; cursor: not-allowed; }
+    .action-top { display: flex; width: 100%; align-items: center; justify-content: space-between; }
+    .action-icon { display: grid; width: 35px; height: 35px; place-items: center; border-radius: 12px; }
+    .action-icon svg { width: 19px; height: 19px; }
+    .action-arrow { color: #74829f; font-size: 17px; }
+    .action-title { margin-top: 12px; font-size: 14px; font-weight: 680; }
+    .action-desc { margin-top: 4px; color: var(--muted); font-size: 11px; line-height: 1.35; }
+    .action-title, .action-desc { display: block; }
+    .blue .action-icon { color: #9fc0ff; background: rgba(113, 157, 255, .16); }
+    .mint .action-icon { color: var(--mint); background: rgba(74, 208, 171, .14); }
+    .amber .action-icon { color: var(--amber); background: rgba(255, 190, 87, .14); }
+    .red .action-icon { color: var(--red); background: rgba(255, 111, 135, .14); }
+
+    .note {
+      display: flex; align-items: flex-start; gap: 11px; margin-top: 17px; padding: 14px 15px;
+      border: 1px solid rgba(255, 195, 106, .18); border-radius: 17px;
+      color: #d4c8b2; background: rgba(105, 75, 31, .13); font-size: 11px; line-height: 1.5;
+    }
+    .note-icon { flex: 0 0 auto; color: var(--amber); font-size: 15px; }
+    .note strong { color: #ffdfa9; }
+    .footer { padding: 19px 7px 0; color: #7986a1; text-align: center; font-size: 10px; line-height: 1.5; }
+    .preview-banner {
+      display: none; margin: 0 0 14px; padding: 12px 14px; border: 1px solid rgba(119,168,255,.22);
+      border-radius: 15px; color: #c9d8fa; background: rgba(62,93,155,.16); font-size: 12px; line-height: 1.45;
+    }
+    .preview .preview-banner { display: block; }
+    .toast {
+      position: fixed; z-index: 5; right: 18px; bottom: calc(18px + var(--safe-bottom)); left: 18px;
+      width: min(420px, calc(100% - 36px)); margin: auto; padding: 13px 16px;
+      border: 1px solid rgba(207,223,255,.17); border-radius: 15px; color: var(--text);
+      background: rgba(28, 39, 64, .94); box-shadow: 0 15px 45px rgba(0,0,0,.35);
+      font-size: 13px; text-align: center; opacity: 0; transform: translateY(12px); pointer-events: none;
+      transition: opacity .2s ease, transform .2s ease;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    @media (max-width: 360px) {
+      body { padding-right: 13px; padding-left: 13px; }
+      .connection { padding: 7px 8px; font-size: 10px; }
+      .hero { padding: 21px 18px; }
+      .action { min-height: 110px; padding: 13px; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; } }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <div class="preview-banner" id="previewBanner">
+      Предпросмотр интерфейса. Для отправки команд откройте Mini App из личного чата Telegram после публикации на HTTPS.
+    </div>
+
+    <header class="topline">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32" fill="none"><path d="M15.9 14.5c-1.2-4.9 1.8-9.4 5.3-10.6 1.2 4.7-.7 9.7-4.5 11.3M17.5 16.1c4.9-1.2 9.4 1.8 10.6 5.3-4.7 1.2-9.7-.7-11.3-4.5M15 17.5c1.2 4.9-1.8 9.4-5.3 10.6-1.2-4.7.7-9.7 4.5-11.3" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><circle cx="16" cy="16" r="3" fill="currentColor"/></svg>
+        </div>
+        <div><div class="brand-name">FanPilot</div><div class="brand-caption">панель управления ПК</div></div>
+      </div>
+      <div class="connection"><span class="dot"></span><span>Личный доступ</span></div>
+    </header>
+
+    <section class="hero" aria-labelledby="title">
+      <div class="eyebrow">Домашний компьютер</div>
+      <h1 id="title">Всё под контролем</h1>
+      <p class="hero-copy">Быстрые и понятные действия. Нажмите кнопку — бот выполнит команду и напишет результат.</p>
+      <div class="status-card">
+        <div><div class="status-label">Состояние компьютера</div><div class="status-value" id="statusValue">Нажмите «Проверить статус»</div></div>
+        <div class="status-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none"><rect x="3.5" y="4.5" width="17" height="12" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M8 20h8m-4-3.5V20m-4-8 2.3-2.3 1.8 1.8 3.9-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-head"><h2>Быстрые действия</h2><span class="section-hint">Нажмите для продолжения</span></div>
+    <section class="action-grid" aria-label="Управление компьютером">
+      <button class="action blue" type="button" data-action="status">
+        <span class="action-top"><span class="action-icon"><svg viewBox="0 0 24 24" fill="none"><rect x="3.5" y="4.5" width="17" height="12" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M8 20h8m-4-3.5V20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span class="action-arrow">›</span></span>
+        <span><span class="action-title">Проверить статус</span><span class="action-desc">Работа ПК и время с запуска</span></span>
+      </button>
+      <button class="action mint" type="button" data-action="wake">
+        <span class="action-top"><span class="action-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3v8m5.7-5.7a8 8 0 1 1-11.4 0" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg></span><span class="action-arrow">›</span></span>
+        <span><span class="action-title">Разбудить устройство</span><span class="action-desc">Wake-on-LAN, если настроен</span></span>
+      </button>
+      <button class="action red" type="button" data-action="shutdown">
+        <span class="action-top"><span class="action-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3v8m5.7-5.7a8 8 0 1 1-11.4 0" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg></span><span class="action-arrow">›</span></span>
+        <span><span class="action-title">Выключить сейчас</span><span class="action-desc">Сразу, без принудительного закрытия программ</span></span>
+      </button>
+      <button class="action amber" type="button" data-action="restart">
+        <span class="action-top"><span class="action-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M20 7v5h-5M4.6 9a7.5 7.5 0 0 1 12.7-2L20 12M4 17v-5h5m10.4 3a7.5 7.5 0 0 1-12.7 2L4 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="action-arrow">›</span></span>
+        <span><span class="action-title">Перезагрузить сейчас</span><span class="action-desc">Сразу, без принудительного закрытия программ</span></span>
+      </button>
+      <button class="action blue" type="button" data-action="sleep">
+        <span class="action-top"><span class="action-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M19.5 15.4A8 8 0 0 1 8.6 4.5 8.5 8.5 0 1 0 19.5 15.4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></span><span class="action-arrow">›</span></span>
+        <span><span class="action-title">Спящий режим</span><span class="action-desc">Усыпить компьютер</span></span>
+      </button>
+      <button class="action mint" type="button" data-action="lock">
+        <span class="action-top"><span class="action-icon"><svg viewBox="0 0 24 24" fill="none"><rect x="5" y="10" width="14" height="11" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M8 10V7a4 4 0 1 1 8 0v3m-4 4v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span class="action-arrow">›</span></span>
+        <span><span class="action-title">Заблокировать Windows</span><span class="action-desc">Закрыть доступ к текущему сеансу</span></span>
+      </button>
+      <button class="action amber" type="button" data-action="timer">
+        <span class="action-top"><span class="action-icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="13" r="8" stroke="currentColor" stroke-width="1.8"/><path d="M12 9v4l2.7 1.6M9 3h6m-3 0v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="action-arrow">›</span></span>
+        <span><span class="action-title">Таймер выключения</span><span class="action-desc">Выбрать секунды, минуты, часы или дни в чате</span></span>
+      </button>
+      <button class="action blue" type="button" data-action="cancel" style="grid-column: 1 / -1; min-height: 82px;">
+        <span class="action-top"><span class="action-icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.5" stroke="currentColor" stroke-width="1.8"/><path d="M9 9l6 6m0-6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span class="action-arrow">›</span></span>
+        <span><span class="action-title">Отменить таймер</span><span class="action-desc">Отменить назначенное выключение</span></span>
+      </button>
+    </section>
+
+    <aside class="note">
+      <span class="note-icon" aria-hidden="true">◆</span>
+      <span><strong>Внимание.</strong> Выключение и перезагрузка выполняются сразу. Сохраняйте документы заранее. Пароли приложение не запрашивает.</span>
+    </aside>
+    <footer class="footer">Бот работает независимо от окна FanPilot, пока ПК включён и выполнен вход в Windows.<br>Если связи нет, проверьте питание и интернет на компьютере.</footer>
+  </main>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    (function () {
+      "use strict";
+      var app = window.Telegram && window.Telegram.WebApp;
+      var toast = document.getElementById("toast");
+      var statusValue = document.getElementById("statusValue");
+      var toastTimer;
+
+      function notify(message) {
+        toast.textContent = message;
+        toast.classList.add("show");
+        window.clearTimeout(toastTimer);
+        toastTimer = window.setTimeout(function () { toast.classList.remove("show"); }, 2800);
+      }
+
+      if (app && app.platform && app.platform !== "unknown" && typeof app.sendData === "function") {
+        document.documentElement.classList.add("telegram");
+        app.ready();
+        app.expand();
+        if (app.themeParams && app.themeParams.bg_color) {
+          document.documentElement.style.setProperty("--tg-bg", app.themeParams.bg_color);
+        }
+      } else {
+        document.documentElement.classList.add("preview");
+      }
+
+      Array.prototype.forEach.call(document.querySelectorAll("[data-action]"), function (button) {
+        button.addEventListener("click", function () {
+          var action = button.getAttribute("data-action");
+          if (!app || !app.platform || app.platform === "unknown" || typeof app.sendData !== "function") {
+            notify("Команды доступны при запуске панели из Telegram после публикации на HTTPS.");
+            return;
+          }
+          if (action === "status") {
+            statusValue.textContent = "Запрос отправлен боту…";
+          }
+          try {
+            app.sendData(JSON.stringify({ action: action }));
+            notify(action === "status" ? "Запрос статуса отправлен в чат." : action === "timer" ? "Напишите длительность таймера в чате с ботом." : "Запрос отправлен боту.");
+            window.setTimeout(function () { app.close(); }, 450);
+          } catch (error) {
+            statusValue.textContent = action === "status" ? "Статус пока не получен" : statusValue.textContent;
+            notify("Не удалось отправить запрос. Проверьте чат с ботом.");
+          }
+        });
+      });
+    }());
+  </script>
+</body>
+</html>
